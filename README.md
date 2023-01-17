@@ -32,7 +32,7 @@ gcloud dataproc jobs submit hive \
 ```
 En adelante, se usara la tabla votes para ejemplificar los cada paso.
 
-3.  Crea la tabla una tabla temporal para cargar los datos desde el archivo de texto (csv)
+2.  Crea la tabla una tabla temporal para cargar los datos desde el archivo de texto (csv)
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -52,7 +52,7 @@ gcloud dataproc jobs submit hive \
 		LINES TERMINATED BY '\n';"
 ```
 
-4. Cargar los datos en la tabla temporal
+3. Cargar los datos en la tabla temporal
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -63,7 +63,7 @@ gcloud dataproc jobs submit hive \
 		INTO TABLE tbl_votes_tmp;"
 ```
 
-5. Verificar si se cargaron los archivos en la tabla temporal
+4. Verificar si se cargaron los archivos en la tabla temporal
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -74,7 +74,7 @@ gcloud dataproc jobs submit hive \
 ```
 
 
-6. Crear la tabla final con la correspondiente particion y buckets (si es posible)
+5. Crear la tabla final con la correspondiente particion y buckets (si es posible)
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -95,7 +95,7 @@ gcloud dataproc jobs submit hive \
 		LINES TERMINATED BY '\n';"
 ```
 
-7. Cargar los datos desde la tabla temporal en la tabla particionada con la configuracion de hive necesaria para crear las particiones
+6. Cargar los datos desde la tabla temporal en la tabla particionada con la configuracion de hive necesaria para crear las particiones
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -112,7 +112,7 @@ gcloud dataproc jobs submit hive \
 		FROM  tbl_votes_tmp;"
 ```
 
-8. Comprobar que los datos se cargaron correctamente en la tabla particionada
+7. Comprobar que los datos se cargaron correctamente en la tabla particionada
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -121,7 +121,7 @@ gcloud dataproc jobs submit hive \
 		USE ${DB};
 		SELECT * FROM tbl_votes LIMIT 20;"
 ```
-9. Borrar la tabla temporal
+8. Borrar la tabla temporal
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
