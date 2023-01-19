@@ -1,12 +1,12 @@
 # Apache-Hive
 
-## I - Configuracion de entorno de trabajo
+## I - Work environment configuration
 
-1. Crear un bucket temporal de Cloud Storage para almacenar los archivos .csv de las tablas
-2. Subir los archivos de trabajo al bucket
-3. Crear un cluster de Dataproc para ejecutar los jobs de Hive
-4. Inicia una instancia de Cloud Shell
-5. En Cloud Shell, configura la zona y region en la que creaste el cluster de Dataproc, el nombre del proyecto, el bucket temporal donde se encuentran los arcivos con los datos y el nombre del cluster.
+1. Create a temporary Cloud Storage bucket to store the .csv files of the tables
+2. Upload the work files to the bucket
+3. Create a Dataproc cluster to run the Hive jobs
+4. Start a Cloud Shell instance
+5. In Cloud Shell, configure the zone and region in which you created the Dataproc cluster, the project name, the temporary bucket where the data files are located, and the cluster name.
 
 ```shell
 export PROJECT=$(gcloud info --format='value(config.project)')
@@ -18,9 +18,9 @@ export DB=DB_NAME
 gcloud config set compute/zone ${ZONE}
 ```
 
-## II - Cargar los datos en HDFS por medio de Hive
+## II - Load data into Hive tables
 
-1. Crear la base de datos, y eliminar la tabla si ya existia
+1. Create the database, and delete the table if it already exists
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -30,9 +30,9 @@ gcloud dataproc jobs submit hive \
 		USE ${DB};
 		DROP TABLE IF EXISTS tbl_votes;"
 ```
-En adelante, se usara la tabla votes para ejemplificar los cada paso.
+From now on, the table ``tbl_votes`` will be used to exemplify each step.
 
-2.  Crea la tabla una tabla temporal para cargar los datos desde el archivo de texto (csv)
+2. Create a temporary table to load the data from the text file (csv)
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -52,7 +52,7 @@ gcloud dataproc jobs submit hive \
 		LINES TERMINATED BY '\n';"
 ```
 
-3. Cargar los datos en la tabla temporal
+3. Load the data into the temporary table
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -63,7 +63,7 @@ gcloud dataproc jobs submit hive \
 		INTO TABLE tbl_votes_tmp;"
 ```
 
-4. Verificar si se cargaron los archivos en la tabla temporal
+4. Check if the files were loaded in the temporary table correctly
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -74,7 +74,7 @@ gcloud dataproc jobs submit hive \
 ```
 
 
-5. Crear la tabla final con la correspondiente particion y buckets (si es posible)
+5. Create the table with the corresponding partition and buckets (if it's possible)
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -95,7 +95,7 @@ gcloud dataproc jobs submit hive \
 		LINES TERMINATED BY '\n';"
 ```
 
-6. Cargar los datos desde la tabla temporal en la tabla particionada con la configuracion de hive necesaria para crear las particiones
+6. Load the data from the temporary table into the partitioned table with the hive configuration needed to create the partitions
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -112,7 +112,7 @@ gcloud dataproc jobs submit hive \
 		FROM  tbl_votes_tmp;"
 ```
 
-7. Comprobar que los datos se cargaron correctamente en la tabla particionada
+7. Verify that the data was successfully loaded into the partitioned table
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
@@ -121,12 +121,14 @@ gcloud dataproc jobs submit hive \
 		USE ${DB};
 		SELECT * FROM tbl_votes LIMIT 20;"
 ```
-8. Borrar la tabla temporal
+8. Delete the temporary table
 ```shell
 gcloud dataproc jobs submit hive \
 	--cluster ${CLUSTER} \
 	--region ${REGION} \
 	--execute "
 		USE ${DB};
-		DROP tbl_votes_tmp;"
+		DROP TABLE tbl_votes_tmp;"
 ```
+
+## III- Test Report Queries
