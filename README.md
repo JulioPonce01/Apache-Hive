@@ -132,3 +132,29 @@ gcloud dataproc jobs submit hive \
 ```
 
 ## III- Test Report Queries
+1. Top Users by Number of Bounties Won?
+The report presents the top users that have to obtain Bounties' reputation by answering questions. The bounty system allows users to offer reputation points for any user that would produce an accepted answer to a question. It is filtered by VoteTypeId = 9 (BountyClose) and has been joined with 3 tables Votes, Posts, and Users. It is ordered descending by the bounty amount won.
+
+```Hiveql
+SELECT tbl_users.DisplayName as Username, tbl_post.Id_OwnerUser as `User Id`, COUNT(tbl_votes.Id) as `Bounties Won`
+FROM tbl_votes 
+INNER JOIN tbl_post ON tbl_votes.PostId = tbl_post.Id_post 
+INNER JOIN tbl_users ON tbl_post.Id_OwnerUser = tbl_users.Id_user
+WHERE tbl_votes.VoteTypeId = 9 
+GROUP BY tbl_post.Id_OwnerUser, tbl_users.DisplayName 
+ORDER BY COUNT(tbl_votes.Id) DESC
+Limit 10;
+```
+
+2. What answers are the most upvoted of All Time?
+This report presents the top 20 most liked or upvoted answers of all time. It has been made by a join between the Votes table and the Posts table. Also filter by PostTypeId = 2 (Answer) and VoteTypeId = 2 (UpVote), the results is present order by Vote coun in descending order.
+
+```Hiveql
+SELECT tbl_votes.PostId as `Post Id`, tbl_post.Score as Question, COUNT(tbl_votes.PostId) as `Vote Count`
+FROM tbl_votes 
+INNER JOIN tbl_post ON tbl_votes.PostId = tbl_post.Id_post 
+WHERE tbl_post.Id_posttype = 2 AND tbl_votes.VoteTypeId = 2 
+GROUP BY tbl_votes.PostId, tbl_post.Score
+ORDER BY COUNT(tbl_votes.PostId) DESC
+LIMIT 10;
+```
