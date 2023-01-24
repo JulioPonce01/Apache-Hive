@@ -40,5 +40,5 @@ SET hive.exec.max.dynamic.partitions = 1000;
 SET hive.exec.max.dynamic.partitions.pernode = 1000;
 INSERT OVERWRITE TABLE tbl_votes 
 PARTITION(VoteTypeId)
-SELECT *
+SELECT Id,PostId,UserId,BountyAmount,CreationDate,VoteTypeId
 FROM  tbl_votes_tmp;

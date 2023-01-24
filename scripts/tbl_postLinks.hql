@@ -2,44 +2,42 @@ CREATE DATABASE IF NOT EXISTS stacksbd;
 
 USE stacksbd;
 
-DROP TABLE IF EXISTS tbl_comments;
+DROP TABLE IF EXISTS tbl_postLinks;
 
-CREATE TABLE IF NOT EXISTS tbl_comments_tmp (
-Id INT, 
+CREATE TABLE IF NOT EXISTS tbl_postLinks_tmp (
+Id INT,
 CreationDate timestamp,
 PostId INT,
-Score INT,
-Text String,
-UserId INT
+RelatedPostId INT,
+LinkTypeId INT
 )
 ROW FORMAT
 DELIMITED FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\n';
 
-LOAD DATA INPATH 'gs://hive_source/commentsTable.csv' 
-INTO TABLE tbl_comments_tmp;
+LOAD DATA INPATH 'gs://hive_source/postLinksTable.csv'
+INTO TABLE tbl_postLinks_tmp;
 
 SET hive.exec.dynamic.partition = true;
 SET hive.exec.dynamic.partition.mode = nonstrict;
 
 
-CREATE TABLE IF NOT EXISTS tbl_comments (
-Id INT, 
+CREATE TABLE IF NOT EXISTS tbl_postLinks (
+Id INT,
 CreationDate timestamp,
 PostId INT,
-Text String,
-UserId INT
+RelatedPostId INT
 )
-PARTITIONED BY(Score INT)
+PARTITIONED BY(LinkTypeId INT)
 CLUSTERED BY(PostId) INTO 10 BUCKETS
 ROW FORMAT
 DELIMITED FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\n';
 
 SET hive.exec.max.dynamic.partitions = 1000;
-INSERT OVERWRITE TABLE tbl_comments 
+INSERT OVERWRITE TABLE tbl_postLinks
 PARTITION(Score)
-SELECT Id,CreationDate,PostId,Text,UserId,Score
-FROM  tbl_comments_tmp;
+SELECT Id,CreationDate,PostId,RelatedPostId,LinkTypeId
+FROM  tbl_postLinks_tmp;
 
-DROP TABLE tbl_comments_tmp;
+DROP TABLE tbl_postLinks_tmp;
